@@ -1,0 +1,13 @@
+.shuffle-parent {
+  font-size: 4rem;
+  font-family: "Press Start 2P", sans-serif;
+  text-transform: uppercase;
+  color: white;
+  display: inline-block;
+}
+
+.shuffle-char {
+  display: inline-block;
+  transform: translateY(40px);
+  opacity: 0;
+}

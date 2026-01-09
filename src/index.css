@@ -1,0 +1,113 @@
+.dashboard-root {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+}
+
+.dashboard-root h2,
+.dashboard-root h3,
+.dashboard-root h4 {
+  font-weight: 600;
+}
+
+.dashboard-root p {
+  line-height: 1.6;
+}
+
+
+
+
+/* 🌍 GLOBAL RESET */
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 🧱 ROOT LAYOUT (CRITICAL FOR LEAFLET) */
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  background: black;
+  overflow: hidden;
+}
+
+/* ✅ LEAFLET HARD REQUIREMENT */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+/* 🧭 FIX MARKER POSITIONING */
+.custom-map-icon {
+  position: relative;
+}
+
+/* Icon container */
+.custom-map-icon .icon-wrapper {
+  position: relative;
+  width: 34px;
+  height: 34px;
+}
+
+/* 🔴 Pulse ring behind icon */
+.custom-map-icon .pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.6;
+  animation: pulse 1.8s infinite;
+  z-index: -1;
+}
+
+/* 🎨 EVENT COLORS */
+.custom-map-icon.earthquake .pulse-ring {
+  background: rgba(241, 3, 3, 0.7);
+}
+
+.custom-map-icon.wildfire .pulse-ring {
+  background: rgba(249, 115, 22, 0.6);
+}
+
+.custom-map-icon.flood .pulse-ring {
+  background: rgba(146, 64, 14, 0.6);
+}
+
+.custom-map-icon.rainfall .pulse-ring {
+  background: rgba(59, 130, 246, 0.6);
+}
+
+.custom-map-icon.deforestation .pulse-ring {
+  background: rgba(34, 197, 94, 0.6);
+}
+
+.custom-map-icon.oceans .pulse-ring {
+  background: rgba(37, 99, 235, 0.6);
+}
+
+.custom-map-icon.snow .pulse-ring {
+  background: rgba(56, 189, 248, 0.6);
+}
+
+/* 🔄 Pulse animation */
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.7;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
