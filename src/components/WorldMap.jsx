@@ -65,9 +65,11 @@ export default function WorldMap({ events = [], location }) {
       attributionControl={true}
     >
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        attribution="© OpenStreetMap, © CARTO"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="© OpenStreetMap contributors"
       />
+
+      
 
       <FitToEvents events={events} location={location} />
 

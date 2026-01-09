@@ -14,14 +14,26 @@ import {
 
 // 2️ helper function (AI narration)
 async function fetchNarration(payload) {
-  const res = await fetch("http://localhost:5000/api/ai-narrate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+ const API_URL =
+  import.meta.env.VITE_AI_API_URL || null;
 
-  const data = await res.json();
-  return data.text || "";
+async function fetchNarration(payload) {
+  if (!API_URL) return ""; // ✅ SAFE fallback for Vercel
+
+  try {
+    const res = await fetch(`${API_URL}/api/ai-narrate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    return data.text || "";
+  } catch {
+    return "";
+  }
+}
+
 }
 
 // 3️ MAIN HANDLER (FINAL)
