@@ -65,9 +65,10 @@ export default function WorldMap({ events = [], location }) {
       attributionControl={true}
     >
       <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution="© OpenStreetMap contributors"
-      />
+  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  attribution="© OpenStreetMap contributors"
+/>
+
 
       
 
