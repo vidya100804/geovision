@@ -12,9 +12,9 @@ app.use(express.json());
 
 app.post("/api/ai-narrate", async (req, res) => {
   try {
-    console.log("👉 ROUTE HIT");
-    console.log("👉 BODY:", req.body);
-    //console.log("👉 API KEY:", process.env.OPENROUTER_API_KEY);
+    console.log("ROUTE HIT");
+    console.log(" BODY:", req.body);
+    //console.log(" API KEY:", process.env.OPENROUTER_API_KEY);
 
     const text = await generateNarration(req.body);
     res.json({ text });
@@ -25,5 +25,5 @@ app.post("/api/ai-narrate", async (req, res) => {
 });
 
 app.listen(5000, () => {
-  console.log("✅ Backend running at http://localhost:5000");
+  console.log("Backend running at http://localhost:5000");
 });

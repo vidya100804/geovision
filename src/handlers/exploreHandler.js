@@ -12,7 +12,7 @@ import {
   fetchOceans,
 } from "../utils/eventService.js";
 
-// 2️⃣ helper function (AI narration)
+// 2️ helper function (AI narration)
 async function fetchNarration(payload) {
   const res = await fetch("http://localhost:5000/api/ai-narrate", {
     method: "POST",
@@ -24,12 +24,12 @@ async function fetchNarration(payload) {
   return data.text || "";
 }
 
-// 3️⃣ MAIN HANDLER (FINAL)
+// 3️ MAIN HANDLER (FINAL)
 export default async function exploreHandler(query, selectedEventType) {
-  // 🔍 Detect from text
+  //  Detect from text
   const detected = detectEvent(query);
 
-  // 🎯 FINAL event type priority:
+  //  FINAL event type priority:
   // Button selection > detected from text
   const eventType = selectedEventType || detected.eventType;
   const locationText = detected.location;
@@ -38,7 +38,7 @@ export default async function exploreHandler(query, selectedEventType) {
     return { events: [], location: null, text: "" };
   }
 
-  // 🌍 Geocode location
+  //  Geocode location
   const geo = await geocodeLocation(locationText);
   if (!geo) {
     return { events: [], location: null, text: "" };
@@ -51,10 +51,10 @@ export default async function exploreHandler(query, selectedEventType) {
     return { events: [], location: geo, text: "Invalid coordinates" };
   }
 
-  // ✅ ALWAYS INITIALIZE
+  //  ALWAYS INITIALIZE
   let events = [];
 
-  // 🚀 EVENT FETCHING (FINAL & CORRECT)
+  //  EVENT FETCHING (FINAL & CORRECT)
   switch (eventType) {
     case "earthquake":
       events = await fetchEarthquakes(lat, lon);
@@ -90,10 +90,10 @@ export default async function exploreHandler(query, selectedEventType) {
   
 
 
-  // 🛡️ HARD SAFETY GUARD
+  //  HARD SAFETY GUARD
   if (!Array.isArray(events)) events = [];
 
-  // 🧹 COORDINATE SANITIZATION (ZOOM RELIABILITY)
+  //  COORDINATE SANITIZATION (ZOOM RELIABILITY)
   events = events.filter(
     (e) =>
       e &&
@@ -103,14 +103,14 @@ export default async function exploreHandler(query, selectedEventType) {
       Math.abs(e.lon) <= 180
   );
 
-  // 🤖 AI narration
+  //  AI narration
   const narration = await fetchNarration({
     eventType,
     location: geo.name,
     eventCount: events.length,
   });
 
-  // ✅ FINAL RETURN
+  //  FINAL RETURN
   return {
     events,
     location: geo,

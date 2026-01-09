@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 
 export async function generateNarration({ eventType, location, eventCount }) {
   if (!process.env.OPENROUTER_API_KEY) {
-    throw new Error("❌ OPENROUTER_API_KEY is missing");
+    throw new Error(" OPENROUTER_API_KEY is missing");
   }
 
   // src/services/aiNarration.js

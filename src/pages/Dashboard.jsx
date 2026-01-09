@@ -47,7 +47,7 @@ ${precautions}
   `;
 
 
-  /* 🔍 LOCATION-BASED SEARCH ONLY */
+  /*  LOCATION-BASED SEARCH ONLY */
 function parseNarration(text) {
   if (!text) return {};
 
@@ -85,7 +85,7 @@ function parseNarration(text) {
     try {
       const result = await exploreHandler(query);
 
-      /* ✅ STRONG FILTER — KILLS VERTICAL LINE BUG */
+      /*  STRONG FILTER — KILLS VERTICAL LINE BUG */
       const safeEvents = (result.events || []).filter(
         (e) =>
           Number.isFinite(e.lat) &&
@@ -97,7 +97,7 @@ function parseNarration(text) {
       setEvents(safeEvents);
       setLocation(result.location || null);
 
-      /* ✅ SINGLE SOURCE OF TEXT */
+      /*  SINGLE SOURCE OF TEXT */
       const parsed = parseNarration(result.text || "");
 
 setNarrative(parsed.description || "—");
@@ -180,7 +180,7 @@ return (
 
 
 
-{/* 🔝 TOP BAR */}
+{/*  TOP BAR */}
 <div
   style={{
     height: "64px",
@@ -191,18 +191,18 @@ return (
     background: "#020617",
   }}
 >
-  {/* 🌍 LOGO — LEFT */}
+  {/*  LOGO — LEFT */}
   <h2 style={{ margin: 0, whiteSpace: "nowrap" }}>
     🌍 GeoVisionAI
   </h2>
 
-  {/* 🔍 SEARCH + EXPLORE — CENTER */}
+  {/*  SEARCH + EXPLORE — CENTER */}
   <div
     style={{
       display: "flex",
       alignItems: "center",
       gap: "0.8rem",
-      margin: "0 auto", // ⬅ centers block
+      margin: "0 auto", 
     }}
   >
     {/* SEARCH BAR */}
@@ -221,7 +221,7 @@ return (
         }}
       />
 
-      {/* 🎤 MIC INSIDE INPUT */}
+      {/*  MIC INSIDE INPUT */}
       <button
         onClick={handleVoiceSearch}
         style={{
@@ -240,7 +240,7 @@ return (
       </button>
     </div>
 
-    {/* 🚀 EXPLORE BUTTON */}
+    {/*  EXPLORE BUTTON */}
     <button
       onClick={handleExplore}
       style={{
@@ -259,7 +259,7 @@ return (
 </div>
 
 
-      {/* 🔽 MAIN CONTENT */}
+      {/*  MAIN CONTENT */}
       <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
         {/* 🟦 LEFT PANEL */}
         <div
@@ -313,12 +313,12 @@ return (
           <LocationsPanel events={events} />
         </div>
 
-        {/* 🗺️ MAP */}
+        {/*  MAP */}
         <div style={{ flex: 1 }}>
           <WorldMap events={events} location={location} />
         </div>
 
-        {/* 🟩 RIGHT PANEL */}
+        {/*  RIGHT PANEL */}
         <div
           style={{
             width: "340px",
@@ -331,7 +331,7 @@ return (
 
     
     
-     {/* 🤖 AI NARRATION HEADER */}
+     {/*  AI NARRATION HEADER */}
 <h4
   style={{
     display: "flex",
@@ -366,7 +366,7 @@ return (
 
 
 
-{/* 📖 DESCRIPTION */}
+{/*  DESCRIPTION */}
 <h4
   style={{
     marginTop: "0.8rem",
@@ -382,7 +382,7 @@ return (
   {narrative}
 </p>
 
-{/* ⚠️ IMPACT */}
+{/*  IMPACT */}
 <h4
   style={{
     marginTop: "1rem",
@@ -398,7 +398,7 @@ return (
   {impact}
 </p>
 
-{/* 🛡️ PRECAUTIONS */}
+{/*  PRECAUTIONS */}
 <h4
   style={{
     marginTop: "1rem",

@@ -9,7 +9,7 @@ import ForestIcon from "@mui/icons-material/Forest";
 import TsunamiIcon from "@mui/icons-material/Tsunami";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 
-/* 🎨 ICON + COLOR MAP */
+/*  ICON + COLOR MAP */
 const ICON_CONFIG = {
   earthquake: {
     Icon: CrisisAlertIcon,

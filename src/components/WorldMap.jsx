@@ -13,7 +13,7 @@ import { renderToString } from "react-dom/server";
 import { createMapIcon } from "./mapIcons";
 import PlaceIcon from "@mui/icons-material/Place";
 
-/* ✅ HARD VALIDATION */
+/*  HARD VALIDATION */
 function isValidCoord(lat, lon) {
   return (
     Number.isFinite(lat) &&
@@ -23,7 +23,7 @@ function isValidCoord(lat, lon) {
   );
 }
 
-/* 📍 LOCATION ICON (MUI → LEAFLET SAFE) */
+/*  LOCATION ICON (MUI → LEAFLET SAFE) */
 const locationIcon = L.divIcon({
   className: "",
   html: renderToString(
@@ -33,7 +33,7 @@ const locationIcon = L.divIcon({
   iconAnchor: [17, 34],
 });
 
-/* 🔁 SAFE AUTO-FIT */
+/*  SAFE AUTO-FIT */
 function FitToEvents({ events, location }) {
   const map = useMap();
 
@@ -71,7 +71,7 @@ export default function WorldMap({ events = [], location }) {
 
       <FitToEvents events={events} location={location} />
 
-      {/* 📍 SEARCHED LOCATION MARKER */}
+      {/*  SEARCHED LOCATION MARKER */}
       {location && isValidCoord(location.lat, location.lon) && (
         <Marker
           position={[location.lat, location.lon]}
@@ -83,7 +83,7 @@ export default function WorldMap({ events = [], location }) {
         </Marker>
       )}
 
-      {/* 🌋 EVENT MARKERS (EARTHQUAKES ETC.) */}
+      {/*  EVENT MARKERS (EARTHQUAKES ETC.) */}
       {events
         .filter((e) => isValidCoord(e.lat, e.lon))
         .map((e, idx) => (

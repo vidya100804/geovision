@@ -27,13 +27,13 @@ export default function Home() {
         background: "black",
       }}
     >
-      {/* 🔵 PARTICLES BACKGROUND */}
+      {/*  PARTICLES BACKGROUND */}
       <Particles />
 
-      {/* 🌍 ROTATING GLOBE */}
+      {/* ROTATING GLOBE */}
       <GlobeBackground />
 
-      {/* 🟢 TEXT OVERLAY */}
+      {/*  TEXT OVERLAY */}
       <div
         style={{
           position: "absolute",
@@ -58,7 +58,7 @@ export default function Home() {
           WELCOME TO
         </p>
 
-        {/* ✨ SHUFFLE TEXT */}
+        {/*  SHUFFLE TEXT */}
         <Shuffle text="GEO VISION" />
 
         <p

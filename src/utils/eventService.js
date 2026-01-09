@@ -38,7 +38,7 @@ export async function fetchWildfires(lat, lon) {
 
     const data = await res.json();
 
-    // 🔥 simple proximity check (California-scale)
+    //  simple proximity check (California-scale)
     const isNear = (aLat, aLon, bLat, bLon, radius = 5) =>
       Math.abs(aLat - bLat) < radius && Math.abs(aLon - bLon) < radius;
 
@@ -60,7 +60,7 @@ export async function fetchWildfires(lat, lon) {
             return null;
           }
 
-          // ✅ FIX: keep only fires near searched location
+          //  FIX: keep only fires near searched location
           if (!isNear(lat, lon, lat2, lon2)) {
             return null;
           }
@@ -190,7 +190,7 @@ export async function fetchOceans(lat, lon) {
       "https://coastwatch.pfeg.noaa.gov/erddap/info/index.json"
     );
 
-    // 🌊 Generate localized ocean events near searched location
+    //  Generate localized ocean events near searched location
     return Array.from({ length: 6 }).map((_, i) => ({
       id: `ocean-${i}`,
       lat: lat + (Math.random() - 0.5) * 1.2,

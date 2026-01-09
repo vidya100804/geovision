@@ -15,7 +15,7 @@ export async function fetchEonetEvents(categoryId) {
 
         const [lon, lat] = geo.coordinates;
 
-        // ✅ HARD FILTER — THIS FIXES THE VERTICAL LINE
+        //  HARD FILTER — THIS FIXES THE VERTICAL LINE
         if (
           typeof lat !== "number" ||
           typeof lon !== "number" ||
