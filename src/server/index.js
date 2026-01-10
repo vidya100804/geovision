@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
- // ✅ LOAD .env FIRST
+ 
 
 const app = express();
 
