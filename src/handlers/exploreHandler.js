@@ -19,7 +19,7 @@ async function fetchNarration(payload) {
   import.meta.env.VITE_AI_API_URL || null;
 
 async function fetchNarration(payload) {
-  if (!API_URL) return ""; // ✅ SAFE fallback for Vercel
+  if (!API_URL) return ""; 
 
   try {
     const res = await fetch(`${API_URL}/api/ai-narrate`, {
