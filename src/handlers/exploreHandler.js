@@ -14,6 +14,7 @@ import {
 
 // 2️ helper function (AI narration)
 async function fetchNarration(payload) {
+  
  const API_URL =
   import.meta.env.VITE_AI_API_URL || null;
 
