@@ -12,14 +12,15 @@ import {
   fetchOceans,
 } from "../utils/eventService.js";
 
-// 2️ helper function (AI narration)
-async function fetchNarration(payload) {
-  
- const API_URL =
-  import.meta.env.VITE_AI_API_URL || null;
+// 2️⃣ ENV (FRONTEND)
+const API_URL = import.meta.env.VITE_AI_API_URL || null;
 
+// 3️⃣ AI NARRATION (FIXED)
 async function fetchNarration(payload) {
-  if (!API_URL) return ""; 
+  if (!API_URL) {
+    console.warn("AI narration skipped: API_URL missing");
+    return "";
+  }
 
   try {
     const res = await fetch(`${API_URL}/api/ai-narrate`, {
@@ -28,22 +29,24 @@ async function fetchNarration(payload) {
       body: JSON.stringify(payload),
     });
 
+    if (!res.ok) {
+      console.error("AI narration failed:", res.status);
+      return "";
+    }
+
     const data = await res.json();
     return data.text || "";
-  } catch {
+  } catch (err) {
+    console.error("AI narration fetch error:", err);
     return "";
   }
 }
 
-}
-
-// 3️ MAIN HANDLER (FINAL)
+// 4️⃣ MAIN HANDLER (FINAL)
 export default async function exploreHandler(query, selectedEventType) {
-  //  Detect from text
   const detected = detectEvent(query);
 
-  //  FINAL event type priority:
-  // Button selection > detected from text
+  // Button selection > detected text
   const eventType = selectedEventType || detected.eventType;
   const locationText = detected.location;
 
@@ -51,7 +54,6 @@ export default async function exploreHandler(query, selectedEventType) {
     return { events: [], location: null, text: "" };
   }
 
-  //  Geocode location
   const geo = await geocodeLocation(locationText);
   if (!geo) {
     return { events: [], location: null, text: "" };
@@ -64,10 +66,8 @@ export default async function exploreHandler(query, selectedEventType) {
     return { events: [], location: geo, text: "Invalid coordinates" };
   }
 
-  //  ALWAYS INITIALIZE
   let events = [];
 
-  //  EVENT FETCHING (FINAL & CORRECT)
   switch (eventType) {
     case "earthquake":
       events = await fetchEarthquakes(lat, lon);
@@ -100,13 +100,9 @@ export default async function exploreHandler(query, selectedEventType) {
     default:
       events = [];
   }
-  
 
-
-  //  HARD SAFETY GUARD
   if (!Array.isArray(events)) events = [];
 
-  //  COORDINATE SANITIZATION (ZOOM RELIABILITY)
   events = events.filter(
     (e) =>
       e &&
@@ -116,18 +112,15 @@ export default async function exploreHandler(query, selectedEventType) {
       Math.abs(e.lon) <= 180
   );
 
-  //  AI narration
   const narration = await fetchNarration({
     eventType,
     location: geo.name,
     eventCount: events.length,
   });
 
-  //  FINAL RETURN
   return {
     events,
     location: geo,
     text: narration,
   };
-  
 }
