@@ -12,10 +12,7 @@ import {
   fetchOceans,
 } from "../utils/eventService.js";
 
-// 2️⃣ ENV (FRONTEND)
-const API_URL = import.meta.env.VITE_AI_API_URL || null;
-
-// 3️⃣ AI NARRATION (FIXED)
+// 2️⃣ AI narration (serverless – works everywhere)
 async function fetchNarration(payload) {
   try {
     const res = await fetch("/api/ai-narrate", {
@@ -32,19 +29,28 @@ async function fetchNarration(payload) {
   }
 }
 
-
-// 4️⃣ MAIN HANDLER (FINAL)
+// 3️⃣ MAIN HANDLER (MINIMALLY MODIFIED)
 export default async function exploreHandler(query, selectedEventType) {
   const detected = detectEvent(query);
 
-  // Button selection > detected text
-  const eventType = selectedEventType || detected.eventType;
+  // ✅ normalize event type (non-breaking)
+  const normalizeType = (t) =>
+    t
+      ?.toLowerCase()
+      .replace("&", "")
+      .replace(/\s+/g, "");
+
+  const eventType =
+    normalizeType(selectedEventType) ||
+    normalizeType(detected.eventType);
+
   const locationText = detected.location;
 
   if (!eventType || !locationText) {
     return { events: [], location: null, text: "" };
   }
 
+  // Geocode location
   const geo = await geocodeLocation(locationText);
   if (!geo) {
     return { events: [], location: null, text: "" };
@@ -59,6 +65,7 @@ export default async function exploreHandler(query, selectedEventType) {
 
   let events = [];
 
+  // 🔥 EVENT FETCHING (UNCHANGED LOGIC)
   switch (eventType) {
     case "earthquake":
       events = await fetchEarthquakes(lat, lon);
@@ -73,7 +80,7 @@ export default async function exploreHandler(query, selectedEventType) {
       break;
 
     case "rainfall":
-      events = await fetchRainfall(lat, lon);
+      events = await fetchRainfall(lat, lon, geo.name);
       break;
 
     case "deforestation":
@@ -81,19 +88,21 @@ export default async function exploreHandler(query, selectedEventType) {
       break;
 
     case "snow":
-      events = await fetchSnow(lat, lon);
+      events = await fetchSnow(lat, lon, geo.name);
       break;
 
     case "oceans":
-      events = await fetchOceans(lat, lon);
+      events = await fetchOceans(lat, lon, geo.name);
       break;
 
     default:
       events = [];
   }
 
+  // 🛡️ HARD SAFETY GUARD
   if (!Array.isArray(events)) events = [];
 
+  // 🔒 COORDINATE SANITIZATION
   events = events.filter(
     (e) =>
       e &&
@@ -103,15 +112,20 @@ export default async function exploreHandler(query, selectedEventType) {
       Math.abs(e.lon) <= 180
   );
 
+  // 🎙️ AI narration
   const narration = await fetchNarration({
     eventType,
     location: geo.name,
     eventCount: events.length,
   });
 
+  // ✅ FINAL RETURN (ADDITIVE ONLY)
   return {
     events,
     location: geo,
+    center: { lat, lon },     // 🧭 optional for map zoom
+    hasEvents: events.length > 0,
     text: narration,
   };
 }
+  
