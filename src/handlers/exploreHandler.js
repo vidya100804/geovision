@@ -17,22 +17,12 @@ const API_URL = import.meta.env.VITE_AI_API_URL || null;
 
 // 3️⃣ AI NARRATION (FIXED)
 async function fetchNarration(payload) {
-  if (!API_URL) {
-    console.warn("AI narration skipped: API_URL missing");
-    return "";
-  }
-
   try {
-    const res = await fetch(`${API_URL}/api/ai-narrate`, {
+    const res = await fetch("/api/ai-narrate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
-    if (!res.ok) {
-      console.error("AI narration failed:", res.status);
-      return "";
-    }
 
     const data = await res.json();
     return data.text || "";
@@ -41,6 +31,7 @@ async function fetchNarration(payload) {
     return "";
   }
 }
+
 
 // 4️⃣ MAIN HANDLER (FINAL)
 export default async function exploreHandler(query, selectedEventType) {
