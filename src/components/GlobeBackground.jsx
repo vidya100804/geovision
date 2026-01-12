@@ -23,22 +23,9 @@ function Marker({ position, event }) {
   );
 }
 
-function Earth({ location, events }) {
+function Earth({ events }) {
   const earthRef = useRef();
   const texture = useTexture("/earth.jpg");
-
-  useFrame(() => {
-    if (!earthRef.current) return;
-
-    earthRef.current.rotation.y += 0.0008;
-
-
-    if (location) {
-      const targetY = (-location.lng * Math.PI) / 180;
-      earthRef.current.rotation.y +=
-        (targetY - earthRef.current.rotation.y) * 0.05;
-    }
-  });
 
   return (
     <group>
@@ -61,12 +48,33 @@ export default function GlobeBackground({ location, events }) {
   return (
     <Canvas
       camera={{ position: [0, 0, 7], fov: 45 }}
-      style={{ position: "absolute", inset: 0, zIndex: 0 }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: "auto",
+      }}
+      onCreated={({ gl }) => {
+        gl.domElement.style.touchAction = "none"; // 🔥 REQUIRED FOR DRAG
+      }}
     >
       <ambientLight intensity={0.6} />
       <directionalLight position={[5, 5, 5]} intensity={1} />
-      <Earth location={location} events={events} />
-      <OrbitControls enableZoom={false} enablePan={false} />
+
+      <Earth events={events} />
+
+      {/* 🔥 THIS IS THE REAL FIX */}
+      <OrbitControls
+        makeDefault        
+        enableRotate       
+        enableZoom={false}
+        enablePan={false}
+        enableDamping
+        dampingFactor={0.1}
+        rotateSpeed={0.8}
+        autoRotate
+        autoRotateSpeed={0.4}
+      />
     </Canvas>
   );
 }

@@ -242,6 +242,7 @@ return (
 
     {/*  EXPLORE BUTTON */}
     <button
+      className="dashboard-explore-btn"
       onClick={handleExplore}
       style={{
         padding: "0.6rem 1.4rem",
@@ -262,15 +263,18 @@ return (
       {/*  MAIN CONTENT */}
       <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
         {/* 🟦 LEFT PANEL */}
-        <div
-          style={{
-            width: "260px",
-            padding: "1rem",
-            borderRight: "1px solid #1f2933",
-            overflowY: "auto",
-          }}
-        >
-          <h4>Select Event Type</h4>
+       <div
+  className="dashboard-left"
+  style={{
+    width: "260px",
+    padding: "1rem",
+    borderRight: "1px solid #1f2933",
+    overflowY: "auto",
+  }}
+>
+
+          <h3 className="event-title">Select Event Type</h3>
+
 
           <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
             {[
@@ -285,26 +289,29 @@ return (
               const Icon = EVENT_ICONS[item.key];
               return (
                 <button
-                  key={item.key}
-                  onClick={() => setSelectedEventType(item.key)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    padding: "0.6rem",
-                    borderRadius: "10px",
-                    border: "1px solid #1f2933",
-                    background:
-                      selectedEventType === item.key
-                        ? "#22d3ee"
-                        : "#0f172a",
-                    color:
-                      selectedEventType === item.key ? "#000" : "#fff",
-                  }}
-                >
-                  <Icon fontSize="small" />
-                  {item.label}
-                </button>
+  key={item.key}
+  className={`event-btn ${
+    selectedEventType === item.key ? "active" : ""
+  }`}
+  onClick={() => setSelectedEventType(item.key)}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "0.6rem",
+    borderRadius: "10px",
+    border: "1px solid #1f2933",
+    background:
+      selectedEventType === item.key
+        ? "#22d3ee"
+        : "#0f172a",
+    color:
+      selectedEventType === item.key ? "#000" : "#fff",
+  }}
+>
+  {Icon && <Icon fontSize="small" />}
+  {item.label}
+</button>
               );
             })}
           </div>
@@ -314,12 +321,14 @@ return (
         </div>
 
         {/*  MAP */}
-        <div style={{ flex: 1 }}>
+        <div className="dashboard-map" style={{ flex: 1 }}>
+
           <WorldMap events={events} location={location} />
         </div>
 
         {/*  RIGHT PANEL */}
         <div
+         className="dashboard-right"
           style={{
             width: "340px",
             padding: "1rem",

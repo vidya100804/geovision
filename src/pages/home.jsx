@@ -7,9 +7,9 @@ import Shuffle from "../components/Shuffle";
 <Shuffle
   text="GEO VISION"
   shuffleDirection="right"
-  duration={350}
-  stagger={30}
-  triggerOnHover={true}
+  duration={1400}
+  stagger={60}
+  triggerOnHover={false}
 />
 
 
@@ -50,7 +50,7 @@ export default function Home() {
       >
         <p
           style={{
-            letterSpacing: "3px",
+            letterSpacing: "8px",
             fontSize: "1.8rem",
             marginBottom: "0.5rem",
           }}
@@ -61,19 +61,24 @@ export default function Home() {
         {/*  SHUFFLE TEXT */}
         <Shuffle text="GEO VISION" />
 
-        <p
-          style={{
-            marginTop: "1rem",
-            maxWidth: "520px",
-            fontSize: "1.2rem",
-            color: "#eaedf4",
-          }}
-        >
+  <p
+    style={{
+      marginTop: "1rem",
+      maxWidth: "520px",
+      fontSize: "1.2rem",
+      color: "#eaedf4",
+      fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica Neue, Arial, sans-serif",
+      opacity: 0.9,
+    }}
+  >
+          
           Click here to know more about the world through intelligent
           geospatial visualization.
+          
         </p>
 
         <button
+          className="explore-animate-btn"
           onClick={() => navigate("/dashboard")}
           style={{
             marginTop: "2rem",
