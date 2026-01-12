@@ -198,6 +198,7 @@ return (
 
   {/*  SEARCH + EXPLORE — CENTER */}
   <div
+    className="dashboard-search"
     style={{
       display: "flex",
       alignItems: "center",
@@ -206,7 +207,9 @@ return (
     }}
   >
     {/* SEARCH BAR */}
-    <div style={{ position: "relative", width: "420px" }}>
+    <div 
+    className="dashboard-search-input"
+    style={{ position: "relative", width: "420px" }}>
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
