@@ -1,0 +1,362 @@
+.dashboard-root {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+}
+
+.dashboard-root h2,
+.dashboard-root h3,
+.dashboard-root h4 {
+  font-weight: 600;
+}
+
+.dashboard-root p {
+  line-height: 1.6;
+}
+
+
+
+
+/* 🌍 GLOBAL RESET */
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 🧱 ROOT LAYOUT (CRITICAL FOR LEAFLET) */
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  background: black;
+  overflow: hidden;
+}
+
+/* ✅ LEAFLET HARD REQUIREMENT */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+/* 🧭 FIX MARKER POSITIONING */
+.custom-map-icon {
+  position: relative;
+}
+
+/* Icon container */
+.custom-map-icon .icon-wrapper {
+  position: relative;
+  width: 34px;
+  height: 34px;
+}
+
+/* 🔴 Pulse ring behind icon */
+.custom-map-icon .pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.6;
+  animation: pulse 1.8s infinite;
+  z-index: -1;
+}
+
+/* 🎨 EVENT COLORS */
+.custom-map-icon.earthquake .pulse-ring {
+  background: rgba(241, 3, 3, 0.7);
+}
+
+.custom-map-icon.wildfire .pulse-ring {
+  background: rgba(249, 115, 22, 0.6);
+}
+
+.custom-map-icon.flood .pulse-ring {
+  background: rgba(146, 64, 14, 0.6);
+}
+
+.custom-map-icon.rainfall .pulse-ring {
+  background: rgba(59, 130, 246, 0.6);
+}
+
+.custom-map-icon.deforestation .pulse-ring {
+  background: rgba(34, 197, 94, 0.6);
+}
+
+.custom-map-icon.oceans .pulse-ring {
+  background: rgba(37, 99, 235, 0.6);
+}
+
+.custom-map-icon.snow .pulse-ring {
+  background: rgba(56, 189, 248, 0.6);
+}
+
+/* 🔄 Pulse animation */
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.7;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+
+
+
+
+
+/* =============================== */
+/* 🚀 HOME EXPLORE BUTTON ANIMATION */
+/* =============================== */
+
+.explore-animate-btn {
+  position: relative;
+  overflow: hidden;
+  animation: floatPulse 2.5s ease-in-out infinite;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* ✨ Hover / Tap */
+.explore-animate-btn:hover,
+.explore-animate-btn:active {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(0, 234, 255, 0.5);
+}
+
+/* 🌊 Soft breathing animation */
+@keyframes floatPulse {
+  0% {
+    box-shadow: 0 0 0 rgba(0, 234, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 234, 255, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(0, 234, 255, 0.3);
+  }
+}
+
+
+
+/* =============================== */
+/* 🎛️ DASHBOARD EVENT BUTTON ANIMATION */
+/* =============================== */
+
+.event-btn {
+  position: relative;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  animation: eventIdleGlow 3s ease-in-out infinite;
+}
+
+/* ✨ Hover effect */
+.event-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 18px rgba(34, 211, 238, 0.45);
+}
+
+/* 🎯 Active (selected) */
+.event-btn.active {
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.85);
+  animation: eventActivePulse 1.6s infinite;
+}
+
+/* 🌊 Idle glow */
+@keyframes eventIdleGlow {
+  0% {
+    box-shadow: 0 0 0 rgba(34, 211, 238, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(34, 211, 238, 0.15);
+  }
+}
+
+/* 🔁 Active pulse */
+@keyframes eventActivePulse {
+  0% {
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(34, 211, 238, 0.95);
+  }
+  100% {
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
+  }
+}
+
+
+/* =============================== */
+/*  EVENT TYPE TITLE + SPACING */
+/* =============================== */
+
+.event-title {
+  text-align: center;        /* center text */
+  margin-bottom: 1rem;       /* space below title */
+  letter-spacing: 1px;       /* slight spacing */
+  font-weight: 600;
+}
+
+/* Better spacing between event buttons */
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;               /* increased line spacing */
+}
+
+
+/* ================================= */
+/* 🌍 DASHBOARD FULL RESPONSIVENESS */
+/* ================================= */
+
+/* Desktop default (already works) */
+.dashboard-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* MAIN CONTENT ROW */
+.dashboard-root > div:last-child {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Ensure map fills space */
+.dashboard-map {
+  flex: 1;
+  position: relative;
+}
+
+.dashboard-map .leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* =============================== */
+/* 📱 MOBILE */
+/* =============================== */
+@media (max-width: 768px) {
+  /* Stack panels vertically */
+  .dashboard-root > div:last-child {
+    flex-direction: column;
+  }
+
+  /* Left panel (event selector) */
+  .dashboard-left {
+    width: 100% !important;
+    max-height: 35vh;
+    border-right: none;
+    border-bottom: 1px solid #1f2933;
+  }
+
+  /* Map */
+  .dashboard-map {
+    height: 45vh;
+    min-height: 300px;
+  }
+
+  /* Right panel (narration) */
+  .dashboard-right {
+    width: 100% !important;
+    max-height: 35vh;
+    border-left: none;
+    border-top: 1px solid #1f2933;
+  }
+}
+
+/* =============================== */
+/* 📱 TABLETS */
+/* =============================== */
+@media (max-width: 1024px) {
+  .dashboard-left {
+    width: 220px;
+  }
+
+  .dashboard-right {
+    width: 300px;
+  }
+}
+
+/* Touch friendly */
+button {
+  touch-action: manipulation;
+}
+
+
+/* =============================== */
+/* 🚀 DASHBOARD EXPLORE BUTTON */
+/* =============================== */
+
+.dashboard-explore-btn {
+  position: relative;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+  animation: dashboardExplorePulse 2.8s ease-in-out infinite;
+}
+
+/* ✨ Hover / tap */
+.dashboard-explore-btn:hover,
+.dashboard-explore-btn:active {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 10px 24px rgba(34, 211, 238, 0.6);
+}
+
+/* 🌊 Idle pulse */
+@keyframes dashboardExplorePulse {
+  0% {
+    box-shadow: 0 0 0 rgba(34, 211, 238, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(34, 211, 238, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(34, 211, 238, 0.25);
+  }
+}
+
+/* ========================= */
+/* 📱 MOBILE SEARCH FIX */
+/* ========================= */
+
+@media (max-width: 768px) {
+  .dashboard-search {
+    flex-direction: column !important;
+    align-items: stretch;
+    width: 100%;
+    padding: 0 1rem;
+    gap: 0.6rem;
+  }
+
+  .dashboard-search-input {
+    width: 100% !important;   /* overrides 420px */
+  }
+
+  .dashboard-search-input input {
+    width: 100%;
+  }
+
+  .dashboard-explore-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
