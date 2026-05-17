@@ -1,162 +1,152 @@
-import { detectEvent, extractLocation } from "../utils/eventDetector";
-import {
-  fetchDeforestation,
-  fetchEarthquakes,
-  fetchFloods,
-  fetchOceans,
-  fetchRainfall,
-  fetchSnow,
-  fetchWildfires,
-} from "../utils/eventService";
-import { geocodeLocation } from "../utils/locationService";
+import { detectEventType } from "../utils/eventDetector";
+import { fetchEarthquakes } from "../utils/eventService";
 
-export async function exploreQuery({
-  query,
-  selectedEventType,
-  timeRange = "24h",
-}) {
-  try {
-    const response = await fetch("/api/explore", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query,
-        selectedEventType,
-        timeRange,
-      }),
-    });
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 
-    const payload = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      console.warn("GeoVision API failed, using browser fallback.", payload);
-      return exploreInBrowser({ query, selectedEventType, timeRange });
-    }
-
-    return payload;
-  } catch (error) {
-    console.warn("GeoVision API unavailable, using browser fallback.", error);
-    return exploreInBrowser({ query, selectedEventType, timeRange });
-  }
+export async function exploreQuery({ query, timeRange = "24h" }) {
+  // No backend server — use the full in-browser pipeline directly
+  return exploreInBrowser({ query, timeRange });
 }
 
-async function exploreInBrowser({
-  query,
-  selectedEventType,
-  timeRange = "24h",
-}) {
-  const detected = detectEvent(query);
-  const eventType = normalizeEventType(selectedEventType || detected.eventType);
-  const locationText = detected.location || extractLocation(query);
+async function exploreInBrowser({ query, timeRange }) {
+  const eventType = detectEventType(query);
+  const locationQuery = extractLocationQuery(query);
+  const location = await geocodeLocation(locationQuery);
 
-  if (!eventType || !locationText) {
-    return {
-      events: [],
-      location: null,
-      text: buildLocalText({
-        query,
-        eventType,
-        location: null,
-        events: [],
-        timeRange,
-      }),
-    };
+  let events = [];
+  if (location) {
+    if (eventType === "earthquake") {
+      events = await fetchEarthquakes(location);
+    }
+    // For weather/airquality/hurricane/drought, no event markers but weather panel will show data
   }
-
-  const location = await geocodeLocation(locationText);
-  if (!location) {
-    return {
-      events: [],
-      location: null,
-      text: buildLocalText({
-        query,
-        eventType,
-        location: null,
-        events: [],
-        timeRange,
-      }),
-    };
-  }
-
-  const lat = Number(location.lat);
-  const lon = Number(location.lon);
-  const events = filterEventsByTime(
-    await fetchEvents(eventType, lat, lon, location.name),
-    timeRange
-  );
 
   return {
-    events,
+    query,
+    eventType,
+    locationQuery,
     location,
-    center: { lat, lon },
-    hasEvents: events.length > 0,
-    text: buildLocalText({ query, eventType, location, events, timeRange }),
+    events,
+    narrative: buildLocalNarrative({
+      query,
+      location,
+      eventType,
+      events,
+      timeRange,
+    }),
+    narrativeSource: "browser-fallback",
   };
 }
 
-function normalizeEventType(eventType) {
-  if (!eventType) return null;
-
-  const normalized = eventType.toLowerCase().replace("&", "").replace(/\s+/g, "");
-  const aliases = {
-    snowfall: "snow",
-    snowice: "snow",
-    ocean: "oceans",
-    tsunami: "oceans",
+function normalizeExplorePayload(payload) {
+  return {
+    ...payload,
+    narrative: payload?.narrative || payload?.text || "",
+    location: payload?.location
+      ? {
+          ...payload.location,
+          lng: payload.location.lng ?? payload.location.lon,
+        }
+      : null,
+    events: (payload?.events || []).map((event) => ({
+      ...event,
+      lng: event.lng ?? event.lon,
+    })),
   };
-
-  return aliases[normalized] || normalized;
 }
 
-async function fetchEvents(eventType, lat, lon, placeName) {
-  switch (eventType) {
-    case "earthquake":
-      return fetchEarthquakes(lat, lon);
-    case "wildfire":
-      return fetchWildfires(lat, lon);
-    case "flood":
-      return fetchFloods(lat, lon);
-    case "rainfall":
-      return fetchRainfall(lat, lon, placeName);
-    case "deforestation":
-      return fetchDeforestation();
-    case "snow":
-      return fetchSnow(lat, lon, placeName);
-    case "oceans":
-      return fetchOceans(lat, lon, placeName);
-    default:
-      return [];
+function extractLocationQuery(query) {
+  // Step 1: strip ALL leading/trailing punctuation and normalize whitespace
+  const cleaned = query
+    .replace(/[?.!,;:]+$/g, "")   // trailing punctuation (fixes "delhi?")
+    .replace(/^[?.!,;:]+/g, "")   // leading punctuation
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Step 2: preposition match — "weather in Delhi", "floods near Mumbai", "at Tokyo"
+  const prepositionMatch = cleaned.match(
+    /\b(?:in|near|around|at|across|for|off|on|over|from|of)\s+([A-Za-z0-9\s,.''-]+?)(?:\s*[?.!]|$)/i
+  );
+  if (prepositionMatch?.[1]) {
+    const loc = cleanLocation(prepositionMatch[1]);
+    if (loc.length > 1) return loc;
+  }
+
+  // Step 3: strip question/command/filler words + all event-type words
+  const noiseWords = [
+    // Question words & auxiliaries
+    "what", "where", "how", "when", "which", "who", "is", "are", "was",
+    "were", "will", "be", "being", "been", "do", "does", "did", "can",
+    "could", "would", "should", "the", "a", "an", "this", "that", "there",
+    // Command verbs
+    "show", "find", "explore", "analyze", "track", "tell", "me", "give",
+    "get", "fetch", "check", "display", "about", "any", "some", "all",
+    "latest", "recent", "current", "active", "past", "last", "today",
+    "now", "live", "real", "time", "realtime",
+    // Event / topic words
+    "weather", "temperature", "temp", "rain", "rainfall", "wind", "humidity",
+    "forecast", "climate", "earthquake", "earthquakes", "quake", "quakes",
+    "seismic", "tremor", "tremors", "wildfire", "wildfires", "fire", "fires",
+    "flood", "floods", "flooding", "tsunami", "tsunamis", "volcano",
+    "volcanoes", "eruption", "eruptions", "snowfall", "snow", "blizzard",
+    "ocean", "hurricane", "cyclone", "typhoon", "drought", "heatwave",
+    "heat", "wave", "aqi", "air", "quality", "pollution", "conditions",
+    "condition", "update", "updates", "report", "reports", "news", "alert",
+    "alerts", "warning", "warnings", "info", "information", "data",
+    "happening", "going", "on",
+  ];
+
+  const noiseRegex = new RegExp(
+    `\\b(${noiseWords.join("|")})\\b`,
+    "gi"
+  );
+
+  const withoutNoise = cleaned
+    .replace(noiseRegex, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleanLocation(withoutNoise || cleaned);
+}
+
+function cleanLocation(location) {
+  return location?.replace(/[?.!,;:]+$/g, "").replace(/^[?.!,;:]+/g, "").trim() || "";
+}
+
+
+async function geocodeLocation(locationQuery) {
+  if (!locationQuery) return null;
+
+  try {
+    const url = new URL("https://nominatim.openstreetmap.org/search");
+    url.searchParams.set("format", "json");
+    url.searchParams.set("limit", "1");
+    url.searchParams.set("q", locationQuery);
+
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "Accept-Language": "en",
+      },
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    if (!Array.isArray(data) || data.length === 0) return null;
+
+    return {
+      name: data[0].display_name,
+      lat: Number.parseFloat(data[0].lat),
+      lng: Number.parseFloat(data[0].lon),
+    };
+  } catch (error) {
+    console.error("Browser geocoding failed:", error);
+    return null;
   }
 }
 
-function filterEventsByTime(events, timeRange) {
-  const ranges = {
-    "24h": 24 * 60 * 60 * 1000,
-    "7d": 7 * 24 * 60 * 60 * 1000,
-    "30d": 30 * 24 * 60 * 60 * 1000,
-  };
-  const windowMs = ranges[timeRange];
-
-  return (events || [])
-    .filter(
-      (event) =>
-        event &&
-        Number.isFinite(event.lat) &&
-        Number.isFinite(event.lon) &&
-        Math.abs(event.lat) <= 90 &&
-        Math.abs(event.lon) <= 180
-    )
-    .filter((event) => {
-      if (!windowMs) return true;
-
-      const timestamp = Number(event.time || event.date || event.createdAt);
-      return !Number.isFinite(timestamp) || timestamp >= Date.now() - windowMs;
-    });
-}
-
-function buildLocalText({ query, eventType, location, events, timeRange }) {
+function buildLocalNarrative({ query, location, eventType, events, timeRange }) {
   const rangeLabel =
     timeRange === "24h"
       ? "the past 24 hours"
@@ -165,27 +155,14 @@ function buildLocalText({ query, eventType, location, events, timeRange }) {
         : "the past 30 days";
 
   if (!location) {
-    return `DESCRIPTION:
-GeoVision could not trace a clear location from "${query}". Add a city, region, or country name and try again.
-
-IMPACT:
-The map needs a resolved place before it can center the view and search nearby event feeds.
-
-PRECAUTIONS:
-Use a query like "earthquakes in Japan" or "wildfires in California".`;
+    return `GeoVision couldn't pinpoint a location from your query. Try being more specific — for example: "weather in Delhi", "earthquakes near Tokyo", or "floods in Bangladesh".`;
   }
 
-  const eventLabel = formatEventType(eventType);
-  const eventCount = events.length;
+  if (events.length > 0) {
+    return `GeoVision traced your query to ${location.name} and found ${events.length} ${formatEventType(eventType)} event${events.length === 1 ? "" : "s"} nearby during ${rangeLabel}. The map has been centered on the detected location and the event markers show related activity around it.`;
+  }
 
-  return `DESCRIPTION:
-GeoVision traced your query to ${location.name} and centered the map there. It found ${eventCount} related ${eventLabel} event${eventCount === 1 ? "" : "s"} during ${rangeLabel}.
-
-IMPACT:
-The map marker shows the resolved location, and nearby event markers show related activity returned by the live feeds or browser fallback.
-
-PRECAUTIONS:
-Use the mapped location as the starting point, check official local alerts for decisions, and widen the time range if no events appear.`;
+  return `GeoVision traced your query to ${location.name} and centered the map there. No matching live ${formatEventType(eventType)} events were returned for ${rangeLabel}, but the location was resolved successfully so you can explore the area on the map.`;
 }
 
 function formatEventType(eventType) {
@@ -193,11 +170,17 @@ function formatEventType(eventType) {
     earthquake: "earthquake",
     wildfire: "wildfire",
     flood: "flood",
-    rainfall: "rainfall",
-    deforestation: "deforestation",
-    snow: "snow and ice",
-    oceans: "ocean anomaly",
+    snowfall: "snowfall",
+    tsunami: "tsunami",
+    volcano: "volcanic",
+    climate: "climate-related",
+    ocean: "ocean-related",
+    hurricane: "hurricane / tropical storm",
+    drought: "drought / heatwave",
+    airquality: "air quality",
+    weather: "weather",
+    general: "natural",
   };
 
-  return labels[eventType] || "natural event";
+  return labels[eventType] || "natural";
 }

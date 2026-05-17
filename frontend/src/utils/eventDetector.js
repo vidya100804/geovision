@@ -1,98 +1,57 @@
 // src/utils/eventDetector.js
-export function detectEvent(query) {
-  if (!query) return { eventType: null, location: null };
 
-  const q = query.toLowerCase();
+const EVENT_KEYWORDS = {
+  earthquake: [
+    "earthquake", "quake", "seismic", "tremor", "richter", "aftershock", "fault line", "magnitude",
+  ],
+  wildfire: [
+    "wildfire", "fire", "forest fire", "bushfire", "burning", "flame", "inferno",
+  ],
+  flood: [
+    "flood", "flooding", "inundation", "overflow", "submerged", "flash flood", "river burst",
+  ],
+  tsunami: [
+    "tsunami", "tidal wave",
+  ],
+  volcano: [
+    "volcano", "eruption", "lava", "magma", "ash cloud", "pyroclastic", "caldera",
+  ],
+  snowfall: [
+    "snow", "snowfall", "blizzard", "winter storm", "ice storm", "snowstorm",
+  ],
+  hurricane: [
+    "hurricane", "cyclone", "typhoon", "tropical storm", "named storm",
+  ],
+  drought: [
+    "drought", "heatwave", "heat wave", "dry spell", "water scarcity", "arid",
+  ],
+  airquality: [
+    "air quality", "aqi", "smog", "pollution", "pm2.5", "pm10", "particulate", "nitrogen dioxide", "ozone level",
+  ],
+  weather: [
+    "weather", "temperature", "rain", "humidity", "wind", "forecast", "sunny", "cloudy", "overcast", "precipitation",
+    "current conditions", "climate today", "what's the weather", "hot today", "cold today",
+  ],
+  ocean: [
+    "ocean", "marine heatwave", "sea surface", "ocean anomaly", "ocean anomalies", "coral bleaching", "sea level",
+  ],
+  climate: [
+    "climate", "global warming", "temperature rise", "greenhouse", "carbon", "emission",
+  ],
+};
 
-  const EVENT_MAP = {
-    earthquake: "earthquake",
-    earthquakes: "earthquake",
-    wildfire: "wildfire",
-    fire: "wildfire",
-    flood: "flood",
-    floods: "flood",
-    rain: "rainfall",
-    rainfall: "rainfall",
-    snow: "snow",
-    snowfall: "snow",
-    ice: "snow",
-    blizzard: "snow",
-    deforestation: "deforestation",
-    forest: "deforestation",
-    ocean: "oceans",
-    oceans: "oceans",
-    tsunami: "oceans",
-  };
+export function detectEventType(query) {
+  if (!query) return "general";
 
-  let eventType = null;
-  for (const key in EVENT_MAP) {
-    if (q.includes(key)) {
-      eventType = EVENT_MAP[key];
-      break;
+  const text = query.toLowerCase();
+
+  for (const [eventType, keywords] of Object.entries(EVENT_KEYWORDS)) {
+    for (const word of keywords) {
+      if (text.includes(word)) {
+        return eventType;
+      }
     }
   }
 
-  const location = extractLocation(q, EVENT_MAP);
-
-  return { eventType, location };
-}
-
-export function extractLocation(query) {
-  if (!query) return null;
-
-  const q = query.toLowerCase().replace(/\s+/g, " ").trim();
-  const prepositionMatch = q.match(
-    /\b(?:in|near|around|at|across|for|off|on)\s+([a-z0-9\s,.'-]+)$/i
-  );
-
-  if (prepositionMatch?.[1]) {
-    return cleanLocation(prepositionMatch[1]);
-  }
-
-  const wordsToRemove = [
-    "show",
-    "find",
-    "explore",
-    "analyze",
-    "track",
-    "latest",
-    "recent",
-    "current",
-    "active",
-    "today",
-    "past",
-    "last",
-    "earthquake",
-    "earthquakes",
-    "wildfire",
-    "wildfires",
-    "fire",
-    "flood",
-    "floods",
-    "rain",
-    "rainfall",
-    "snow",
-    "snowfall",
-    "ice",
-    "blizzard",
-    "deforestation",
-    "forest",
-    "ocean",
-    "oceans",
-    "tsunami",
-  ];
-
-  const location = wordsToRemove
-    .reduce(
-      (text, word) => text.replace(new RegExp(`\\b${word}\\b`, "gi"), " "),
-      q
-    )
-    .replace(/\s+/g, " ")
-    .trim();
-
-  return cleanLocation(location);
-}
-
-function cleanLocation(location) {
-  return location?.replace(/[?.!]+$/g, "").trim() || null;
+  return "general";
 }
