@@ -4,9 +4,9 @@ import React from "react";
 export const LAYER_OPTIONS = [
   { id: "dark", label: "🗺️ Dark", title: "Dark map base" },
   { id: "satellite", label: "🛰️ Satellite", title: "Satellite imagery" },
-  { id: "precipitation", label: "🌧️ Rain", title: "Precipitation overlay" },
-  { id: "wind", label: "💨 Wind", title: "Wind speed overlay" },
-  { id: "temp", label: "🌡️ Temp", title: "Surface temperature overlay" },
+  { id: "street", label: "🛣️ Street", title: "Street map base" },
+  { id: "terrain", label: "⛰️ Terrain", title: "Terrain & Topography" },
+  { id: "precipitation", label: "🌧️ Live Rain", title: "Real-time radar overlay" },
 ];
 
 export default function MapLayersToggle({ activeLayer, onLayerChange }) {

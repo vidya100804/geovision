@@ -237,21 +237,18 @@ const TILE_LAYERS = {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "&copy; Esri",
   },
+  street: {
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: '&copy; OpenStreetMap',
+  },
+  terrain: {
+    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    attribution: '&copy; OpenTopoMap',
+  },
   precipitation: {
     base: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    overlay: "https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=demo",
-    attribution: "&copy; CARTO &copy; OpenWeatherMap",
-  },
-  wind: {
-    base: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    overlay: "https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=demo",
-    attribution: "&copy; CARTO &copy; OpenWeatherMap",
-  },
-  temp: {
-    base: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    overlay: "https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=demo",
-    attribution: "&copy; CARTO &copy; OpenWeatherMap",
-  },
+    attribution: "&copy; CARTO &copy; RainViewer",
+  }
 };
 
 function LayerManager({ activeLayer }) {
@@ -263,13 +260,22 @@ function LayerManager({ activeLayer }) {
       map.removeLayer(overlayRef.current);
       overlayRef.current = null;
     }
-    const config = TILE_LAYERS[activeLayer];
-    if (!config) return;
-    if (config.overlay) {
-      const overlay = L.tileLayer(config.overlay, { opacity: 0.7 });
-      overlay.addTo(map);
-      overlayRef.current = overlay;
+    
+    if (activeLayer === "precipitation") {
+      fetch("https://api.rainviewer.com/public/weather-maps.json")
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+            const latest = data.radar.past[data.radar.past.length - 1].path;
+            const url = `https://tilecache.rainviewer.com${latest}/256/{z}/{x}/{y}/2/1_1.png`;
+            const overlay = L.tileLayer(url, { opacity: 0.6, zIndex: 10 });
+            overlay.addTo(map);
+            overlayRef.current = overlay;
+          }
+        })
+        .catch(err => console.error("Failed to load RainViewer data", err));
     }
+    
     return () => {
       if (overlayRef.current) map.removeLayer(overlayRef.current);
     };
