@@ -117,7 +117,7 @@ export default function Dashboard() {
 
   const handleKeyDown = (e) => { if (e.key === "Enter" && query && !loading) handleExplore(); };
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <>
       {/* Tab bar */}
       <div className="gv-tabs">
@@ -284,7 +284,7 @@ export default function Dashboard() {
       <div className="gv-body">
         {/* ── Desktop sidebar ── */}
         <aside className="gv-sidebar gv-sidebar--desktop">
-          <SidebarContent />
+          {sidebarContent}
         </aside>
 
         {/* ── Mobile drawer backdrop ── */}
@@ -297,7 +297,7 @@ export default function Dashboard() {
           <div className="gv-drawer-handle" onClick={() => setDrawerOpen(false)}>
             <div className="gv-drawer-pill" />
           </div>
-          <SidebarContent />
+          {sidebarContent}
         </aside>
 
         {/* ── Map Panel ── */}
